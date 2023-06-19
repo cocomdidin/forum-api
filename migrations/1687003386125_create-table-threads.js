@@ -19,9 +19,8 @@ exports.up = (pgm) => {
     owner: {
       type: 'VARCHAR(50)',
       notNull: true,
-      unique: true,
     },
-    created_at: {
+    date: {
       type: 'TIMESTAMP',
       notNull: true,
       default: pgm.func('current_timestamp'),
