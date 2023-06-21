@@ -3,28 +3,24 @@ class AddedComment {
     this._verifyPayload(payload);
 
     const {
-      id, threadId, content, commentId, owner,
+      id, content, owner,
     } = payload;
 
     this.id = id;
-    this.threadId = threadId;
     this.content = content;
-    this.commentId = commentId;
     this.owner = owner;
   }
 
   _verifyPayload({
-    id, threadId, content, commentId, owner,
+    id, content, owner,
   }) {
-    if (!id || !threadId || !content || !owner) {
+    if (!id || !content || !owner) {
       throw new Error('ADDED_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof id !== 'string'
-    || typeof threadId !== 'string'
     || typeof content !== 'string'
-    || typeof owner !== 'string'
-    || (commentId !== null && typeof commentId !== 'string')) {
+    || typeof owner !== 'string') {
       throw new Error('ADDED_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

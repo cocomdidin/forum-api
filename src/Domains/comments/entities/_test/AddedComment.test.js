@@ -15,9 +15,7 @@ describe('a AddedComment entities', () => {
     // Arrange
     const payload = {
       id: 'comment-123',
-      threadId: 'thread-123',
       content: 'thread comment',
-      commentId: null,
       owner: 'user-123',
     };
 
@@ -26,9 +24,7 @@ describe('a AddedComment entities', () => {
 
     // Assert
     expect(addedComment.id).toEqual(payload.id);
-    expect(addedComment.threadId).toEqual(payload.threadId);
     expect(addedComment.content).toEqual(payload.content);
-    expect(addedComment.commentId).toEqual(payload.commentId);
     expect(addedComment.owner).toEqual(payload.owner);
   });
 });
