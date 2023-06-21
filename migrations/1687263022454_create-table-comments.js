@@ -8,7 +8,7 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
-    threadId: {
+    thread_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'threads',
@@ -18,7 +18,7 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
-    commentId: {
+    comment_id: {
       type: 'VARCHAR(50)',
       notNull: false,
       references: 'comments',
@@ -33,7 +33,7 @@ exports.up = (pgm) => {
       notNull: true,
       default: pgm.func('current_timestamp'),
     },
-    deletedAt: {
+    deleted_at: {
       type: 'TIMESTAMP',
       notNull: false,
     },

@@ -4,12 +4,13 @@ const AddComment = require('../../../Domains/comments/entities/AddComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
-const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable({});
   });
 
   afterAll(async () => {
@@ -61,6 +62,59 @@ describe('CommentRepositoryPostgres', () => {
         content: 'content comment',
         owner: 'user-123',
       }));
+    });
+  });
+
+  describe('getCommentById function', () => {
+    it('should return comment correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+
+      const addComment = new AddComment({
+        threadId: 'thread-123',
+        content: 'content comment',
+        commentId: null,
+        owner: 'user-123',
+      });
+      const fakeIdGenerator = () => '123'; // stub!
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+      await commentRepositoryPostgres.addComment(addComment);
+
+      // Action
+      const comment = await commentRepositoryPostgres.getCommentById('comment-123');
+
+      // Assert
+      expect(comment).toStrictEqual({
+        id: 'comment-123',
+        content: 'content comment',
+        username: 'dicoding',
+        date: expect.any(Date),
+      });
+    });
+  });
+
+  describe('getCommentsByThread function', () => {
+    it('should return comment correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+
+      const addComment = new AddComment({
+        threadId: 'thread-123',
+        content: 'content comment',
+        commentId: null,
+        owner: 'user-123',
+      });
+      const fakeIdGenerator = () => '123'; // stub!
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+      await commentRepositoryPostgres.addComment(addComment);
+
+      // Action
+      const comments = await commentRepositoryPostgres.getCommentsByThread(addComment.threadId);
+
+      // Assert
+      expect(comments).toHaveLength(1);
     });
   });
 });

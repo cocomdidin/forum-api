@@ -2,7 +2,6 @@ const AddComment = require('../../../Domains/comments/entities/AddComment');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const AddCommentUseCase = require('../AddCommentUseCase');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 
 describe('AddCommentUseCase', () => {
   it('should throw inVariantError when threadId is not found', async () => {
