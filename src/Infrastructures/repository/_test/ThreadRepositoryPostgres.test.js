@@ -1,4 +1,5 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const pool = require('../../database/postgres/pool');
 const AddThread = require('../../../Domains/threads/entities/AddThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
@@ -7,6 +8,7 @@ const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 describe('ThreadRepositoryPostgres', () => {
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
@@ -57,6 +59,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('getThreadById function', () => {
     it('should return thread correctly', async () => {
       // Arrange
+      await UsersTableTestHelper.addUser({});
       const addThread = new AddThread({
         title: 'thread title',
         body: 'thread body',
@@ -74,7 +77,7 @@ describe('ThreadRepositoryPostgres', () => {
         id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
-        owner: 'user-123',
+        username: 'dicoding',
         date: expect.any(Date),
       });
     });

@@ -26,7 +26,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getCommentById(id) {
     const query = {
-      text: 'SELECT comments.id, users.username, comments.date, comments.content FROM comments LEFT JOIN users ON users.id = comments.owner WHERE comments.deleted_at IS NULL AND comments.id = $1',
+      text: 'SELECT comments.id, comments.date, comments.content, comments.owner, users.username FROM comments LEFT JOIN users ON users.id = comments.owner WHERE comments.deleted_at IS NULL AND comments.id = $1',
       values: [id],
     };
 
@@ -44,6 +44,15 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this._pool.query(query);
 
     return result.rows;
+  }
+
+  async deleteCommentById(id) {
+    const query = {
+      text: 'UPDATE comments SET deleted_at = NOW() WHERE id = $1',
+      values: [id],
+    };
+
+    await this._pool.query(query);
   }
 }
 

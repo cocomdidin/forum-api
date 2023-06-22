@@ -88,6 +88,7 @@ describe('CommentRepositoryPostgres', () => {
       expect(comment).toStrictEqual({
         id: 'comment-123',
         content: 'content comment',
+        owner: 'user-123',
         username: 'dicoding',
         date: expect.any(Date),
       });
@@ -115,6 +116,32 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       expect(comments).toHaveLength(1);
+    });
+  });
+
+  describe('deleteCommentById function', () => {
+    it('should delete comment correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+
+      const addComment = new AddComment({
+        threadId: 'thread-123',
+        content: 'content comment',
+        commentId: null,
+        owner: 'user-123',
+      });
+      const fakeIdGenerator = () => '123'; // stub!
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+      await commentRepositoryPostgres.addComment(addComment);
+
+      // Action
+      await commentRepositoryPostgres.deleteCommentById('comment-123');
+
+      // Assert
+      const comments = await CommentsTableTestHelper.findCommentsById('comment-123');
+      expect(comments).toHaveLength(1);
+      expect(comments[0].deleted_at).toEqual(expect.any(Date));
     });
   });
 });

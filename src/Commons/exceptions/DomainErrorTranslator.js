@@ -1,3 +1,4 @@
+const AuthorizationError = require('./AuthorizationError');
 const InvariantError = require('./InvariantError');
 const NotFoundError = require('./NotFoundError');
 
@@ -26,6 +27,15 @@ DomainErrorTranslator._directories = {
   'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment baru karena tipe data tidak sesuai'),
   'ADD_COMMENT_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat comment baru karena properti yang dibutuhkan tidak ada'),
   'ADD_COMMENT_USE_CASE.THREAD_ID_IS_NOT_FOUND': new NotFoundError('tidak dapat membuat comment baru karena threadId tidak ditemukan'),
+
+  'DELETE_COMMENT_USE_CASE.NOT_CONTAIN_ANY_PROPERTY': new InvariantError('tidak dapat menghapus comment karena tidak ada properti yang dikirimkan'),
+  'DELETE_COMMENT_USE_CASE.NOT_CONTAIN_COMMENT_ID': new InvariantError('tidak dapat menghapus comment karena tidak ada properti commentId'),
+  'DELETE_COMMENT_USE_CASE.NOT_CONTAIN_THREAD_ID': new InvariantError('tidak dapat menghapus comment karena tidak ada properti threadId'),
+  'DELETE_COMMENT_USE_CASE.NOT_CONTAIN_OWNER': new InvariantError('tidak dapat menghapus comment karena tidak ada properti owner'),
+  'DELETE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menghapus comment karena tipe data tidak sesuai'),
+  'DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('tidak dapat menghapus comment karena thread tidak ditemukan'),
+  'DELETE_COMMENT_USE_CASE.COMMENT_NOT_OWNED': new AuthorizationError('tidak dapat menghapus comment karena tidak memiliki akses'),
+  'DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('tidak dapat menghapus comment karena comment tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;
