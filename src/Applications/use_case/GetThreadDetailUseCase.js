@@ -26,7 +26,17 @@ class GetThreadDetailUseCase {
       throw new Error('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND');
     }
 
-    const comments = await this._commentRepository.getCommentsByThread(threadId);
+    const originComments = await this._commentRepository.getCommentsByThread(threadId);
+
+    const comments = await Promise.all(originComments.map(async (comment) => {
+      const {
+        id, username, date, content, deleted_at: deletedAt,
+      } = comment;
+
+      return {
+        id, username, date, content: deletedAt ? '**komentar telah dihapus**' : content,
+      };
+    }));
 
     return { ...thread, comments };
   }

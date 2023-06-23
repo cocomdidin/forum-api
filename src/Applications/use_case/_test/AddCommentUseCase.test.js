@@ -142,6 +142,9 @@ describe('AddCommentUseCase', () => {
       commentId: useCasePayload.commentId,
       owner: useCasePayload.owner,
     }));
+
+    expect(mockCommentRepository.addComment).toBeCalledWith(mockAddComment);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(useCasePayload.threadId);
   });
 
   it('should orchestrating the add comment action correctly when commentId is not null', async () => {
@@ -196,5 +199,8 @@ describe('AddCommentUseCase', () => {
       commentId: useCasePayload.commentId,
       owner: useCasePayload.owner,
     }));
+
+    expect(mockCommentRepository.addComment).toBeCalledWith(mockAddComment);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith(useCasePayload.threadId);
   });
 });

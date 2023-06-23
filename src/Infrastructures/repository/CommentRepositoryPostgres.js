@@ -37,7 +37,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getCommentsByThread(threadId) {
     const query = {
-      text: 'SELECT comments.id, users.username, comments.date, CASE WHEN comments.deleted_at IS NULL THEN comments.content ELSE \'**komentar telah dihapus**\' END AS content FROM comments LEFT JOIN users ON users.id = comments.owner WHERE comments.thread_id = $1',
+      text: 'SELECT comments.id, users.username, comments.date, comments.content, comments.deleted_at FROM comments LEFT JOIN users ON users.id = comments.owner WHERE comments.thread_id = $1',
       values: [threadId],
     };
 
