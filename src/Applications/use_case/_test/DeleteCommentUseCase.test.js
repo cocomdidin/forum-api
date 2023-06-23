@@ -93,6 +93,35 @@ describe('DeleteCommentUseCase', () => {
       .toThrowError('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
   });
 
+  it('should throw error if comment not found', async () => {
+    const useCasePayload = {
+      commentId: 'comment-XXX',
+      threadId: 'thread-123',
+      owner: 'user-123',
+    };
+
+    /** creating dependency of use case */
+    const mockCommentRepository = new CommentRepository();
+    const mockThreadRepository = new ThreadRepository();
+
+    /** mocking needed function */
+    mockCommentRepository.getCommentById = jest.fn()
+      .mockImplementation(() => Promise.resolve(null));
+    mockThreadRepository.getThreadById = jest.fn()
+      .mockImplementation(() => Promise.resolve({ id: useCasePayload.threadId }));
+
+    /** creating use case instance */
+    const deleteCommentUseCase = new DeleteCommentUseCase({
+      commentRepository: mockCommentRepository,
+      threadRepository: mockThreadRepository,
+    });
+
+    // Action
+    await expect(deleteCommentUseCase.execute(useCasePayload))
+      .rejects
+      .toThrowError('DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND');
+  });
+
   it('should throw error if comment not owned', async () => {
     const useCasePayload = {
       commentId: 'comment-123',

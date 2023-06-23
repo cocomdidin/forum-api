@@ -3,6 +3,23 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const AddThreadUseCase = require('../AddThreadUseCase');
 
 describe('AddThreadUseCase', () => {
+  it('should throw error if use case payload not contain needed property', async () => {
+    // Arrange
+    const useCasePayload = {
+      // title: 'Thread title',
+      // body: 'Thread body',
+      // owner: 'user-123',
+    };
+
+    /** creating use case instance */
+    const addThreadUseCase = new AddThreadUseCase({});
+
+    // Action & Assert
+    await expect(addThreadUseCase.execute(useCasePayload))
+      .rejects
+      .toThrowError('ADD_THREAD_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY');
+  });
+
   it('should orchestrating the add thread action correctly', async () => {
     // Arrange
     const useCasePayload = {

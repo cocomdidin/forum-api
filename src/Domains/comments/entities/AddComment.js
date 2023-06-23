@@ -15,7 +15,7 @@ class AddComment {
   _verifyPayload({
     threadId, content, commentId, owner,
   }) {
-    if (!threadId || !content || !owner) {
+    if (!threadId || !content || !owner || commentId === undefined) {
       throw new Error('ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 

@@ -26,6 +26,7 @@ DomainErrorTranslator._directories = {
   'ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat comment baru karena properti yang dibutuhkan tidak ada'),
   'ADD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment baru karena tipe data tidak sesuai'),
   'ADD_COMMENT_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat comment baru karena properti yang dibutuhkan tidak ada'),
+  'ADD_COMMENT_USE_CASE.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment baru karena tipe data tidak sesuai'),
   'ADD_COMMENT_USE_CASE.THREAD_ID_IS_NOT_FOUND': new NotFoundError('tidak dapat membuat comment baru karena threadId tidak ditemukan'),
 
   'DELETE_COMMENT_USE_CASE.NOT_CONTAIN_ANY_PROPERTY': new InvariantError('tidak dapat menghapus comment karena tidak ada properti yang dikirimkan'),

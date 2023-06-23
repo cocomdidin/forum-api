@@ -12,12 +12,21 @@ class AddCommentUseCase {
     return this._commentRepository.addComment(addComment);
   }
 
-  async _validatePayload(payload) {
-    if (!payload) {
+  async _validatePayload({
+    threadId,
+    content,
+    commentId,
+    owner,
+  }) {
+    if (!threadId || !content || !owner) {
       throw new Error('ADD_COMMENT_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    const thread = await this._threadRepository.getThreadById(payload.threadId);
+    if (typeof threadId !== 'string' || typeof content !== 'string' || typeof owner !== 'string') {
+      throw new Error('ADD_COMMENT_USE_CASE.NOT_MEET_DATA_TYPE_SPECIFICATION');
+    }
+
+    const thread = await this._threadRepository.getThreadById(threadId);
     if (!thread) {
       throw new Error('ADD_COMMENT_USE_CASE.THREAD_ID_IS_NOT_FOUND');
     }

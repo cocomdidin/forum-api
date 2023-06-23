@@ -11,8 +11,8 @@ class AddThreadUseCase {
     return this._threadRepository.addThread(addThread);
   }
 
-  _validatePayload(payload) {
-    if (!payload) {
+  _validatePayload({ title, body, owner }) {
+    if (!title || !body || !owner) {
       throw new Error('ADD_THREAD_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY');
     }
   }
