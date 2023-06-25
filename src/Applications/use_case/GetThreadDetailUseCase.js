@@ -6,6 +6,7 @@ class GetThreadDetailUseCase {
 
   async execute(threadId) {
     await this._validatePayload(threadId);
+    await this._threadRepository.verifyThreadAvailability(threadId);
     return this._getThreadDetail(threadId);
   }
 
@@ -21,10 +22,6 @@ class GetThreadDetailUseCase {
 
   async _getThreadDetail(threadId) {
     const thread = await this._threadRepository.getThreadById(threadId);
-
-    if (!thread) {
-      throw new Error('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND');
-    }
 
     const originComments = await this._commentRepository.getCommentsByThread(threadId);
 

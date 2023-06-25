@@ -6,8 +6,11 @@ class DeleteCommentUseCase {
 
   async execute(useCasePayload) {
     await this._validatePayload(useCasePayload);
-    await this._verifyThread(useCasePayload);
-    await this._verifyCommentOwner(useCasePayload);
+    await this._threadRepository.verifyThreadAvailability(useCasePayload.threadId);
+    await this._commentRepository.verifyCommentAvailability(useCasePayload.commentId);
+    await this._commentRepository.verifyCommentOwner(
+      useCasePayload.commentId, useCasePayload.owner,
+    );
     await this._commentRepository.deleteCommentById(useCasePayload.commentId);
   }
 
@@ -31,25 +34,6 @@ class DeleteCommentUseCase {
 
     if (typeof commentId !== 'string' || typeof threadId !== 'string' || typeof owner !== 'string') {
       throw new Error('DELETE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
-    }
-  }
-
-  async _verifyThread({ threadId }) {
-    const thread = await this._threadRepository.getThreadById(threadId);
-    if (!thread) {
-      throw new Error('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
-    }
-  }
-
-  async _verifyCommentOwner({ commentId, owner }) {
-    const comment = await this._commentRepository.getCommentById(commentId);
-
-    if (!comment) {
-      throw new Error('DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND');
-    }
-
-    if (comment.owner !== owner) {
-      throw new Error('DELETE_COMMENT_USE_CASE.COMMENT_NOT_OWNED');
     }
   }
 }

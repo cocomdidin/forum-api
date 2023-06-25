@@ -1,6 +1,8 @@
 const DeleteCommentUseCase = require('../DeleteCommentUseCase');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 describe('DeleteCommentUseCase', () => {
   it('should throw error if use case payload not contain any property', async () => {
@@ -76,10 +78,10 @@ describe('DeleteCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockCommentRepository.getCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: useCasePayload.commentId }));
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(null));
+    mockThreadRepository.verifyThreadAvailability = jest.fn(useCasePayload.threadId)
+      .mockImplementation(() => {
+        throw new NotFoundError('Thread tidak ditemukan');
+      });
 
     /** creating use case instance */
     const deleteCommentUseCase = new DeleteCommentUseCase({
@@ -90,7 +92,7 @@ describe('DeleteCommentUseCase', () => {
     // Action
     await expect(deleteCommentUseCase.execute(useCasePayload))
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.THREAD_NOT_FOUND');
+      .toThrowError(NotFoundError);
   });
 
   it('should throw error if comment not found', async () => {
@@ -105,10 +107,12 @@ describe('DeleteCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockCommentRepository.getCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve(null));
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: useCasePayload.threadId }));
+    mockThreadRepository.verifyThreadAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => {
+        throw new NotFoundError('Komentar tidak ditemukan');
+      });
 
     /** creating use case instance */
     const deleteCommentUseCase = new DeleteCommentUseCase({
@@ -119,7 +123,7 @@ describe('DeleteCommentUseCase', () => {
     // Action
     await expect(deleteCommentUseCase.execute(useCasePayload))
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.COMMENT_NOT_FOUND');
+      .toThrowError(NotFoundError);
   });
 
   it('should throw error if comment not owned', async () => {
@@ -134,10 +138,15 @@ describe('DeleteCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockCommentRepository.getCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: 'comment-123', owner: 'user-123' }));
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: useCasePayload.threadId }));
+    mockThreadRepository.verifyThreadAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentOwner = jest
+      .fn(useCasePayload.commentId, useCasePayload.owner)
+      .mockImplementation(() => {
+        throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+      });
 
     /** creating use case instance */
     const deleteCommentUseCase = new DeleteCommentUseCase({
@@ -148,7 +157,7 @@ describe('DeleteCommentUseCase', () => {
     // Action
     await expect(deleteCommentUseCase.execute(useCasePayload))
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.COMMENT_NOT_OWNED');
+      .toThrowError(AuthorizationError);
   });
 
   it('should orchestrating the delete comment action correctly', async () => {
@@ -164,12 +173,13 @@ describe('DeleteCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: useCasePayload.threadId }));
-    mockCommentRepository.getCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve({
-        id: useCasePayload.commentId, owner: useCasePayload.owner,
-      }));
+    mockThreadRepository.verifyThreadAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentAvailability = jest.fn(useCasePayload.commentId)
+      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.verifyCommentOwner = jest
+      .fn(useCasePayload.commentId, useCasePayload.owner)
+      .mockImplementation(() => Promise.resolve());
     mockCommentRepository.deleteCommentById = jest.fn()
       .mockImplementation(() => Promise.resolve());
 
@@ -183,8 +193,13 @@ describe('DeleteCommentUseCase', () => {
     await deleteCommentUseCase.execute(useCasePayload);
 
     // Assert
-    expect(mockCommentRepository.getCommentById).toHaveBeenCalledWith(useCasePayload.commentId);
-    expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(useCasePayload.threadId);
-    expect(mockCommentRepository.deleteCommentById).toHaveBeenCalledWith(useCasePayload.commentId);
+    expect(mockThreadRepository.verifyThreadAvailability)
+      .toHaveBeenCalledWith(useCasePayload.threadId);
+    expect(mockCommentRepository.verifyCommentAvailability)
+      .toHaveBeenCalledWith(useCasePayload.commentId);
+    expect(mockCommentRepository.verifyCommentOwner)
+      .toHaveBeenCalledWith(useCasePayload.commentId, useCasePayload.owner);
+    expect(mockCommentRepository.deleteCommentById)
+      .toHaveBeenCalledWith(useCasePayload.commentId);
   });
 });

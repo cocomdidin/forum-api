@@ -1,3 +1,4 @@
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
@@ -30,6 +31,9 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
 
     /** mocking needed function */
+    mockThreadRepository.verifyThreadAvailability = jest.fn(() => {
+      throw new NotFoundError('Thread tidak ditemukan');
+    });
     mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(null));
     mockCommentRepository.getCommentsByThread = jest.fn(() => Promise.resolve([]));
 
@@ -42,7 +46,7 @@ describe('GetThreadDetailUseCase', () => {
     // Action & Assert
     await expect(getThreadDetailUseCase.execute(useCasePayload))
       .rejects
-      .toThrowError('GET_THREAD_DETAIL_USE_CASE.THREAD_NOT_FOUND');
+      .toThrowError(NotFoundError);
   });
 
   it('should orchestrating the get thread detail action correctly', async () => {
@@ -67,6 +71,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
 
     /** mocking needed function */
+    mockThreadRepository.verifyThreadAvailability = jest.fn(() => Promise.resolve());
     mockThreadRepository.getThreadById = jest.fn(expectedThread.id)
       .mockImplementation(() => Promise.resolve(expectedThread));
     mockCommentRepository.getCommentsByThread = jest.fn(expectedThread.id)
@@ -115,6 +120,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
 
     /** mocking needed function */
+    mockThreadRepository.verifyThreadAvailability = jest.fn(() => Promise.resolve());
     mockThreadRepository.getThreadById = jest.fn(expectedThread.id)
       .mockImplementation(() => Promise.resolve(expectedThread));
     mockCommentRepository.getCommentsByThread = jest.fn(expectedThread.id)
@@ -168,6 +174,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
 
     /** mocking needed function */
+    mockThreadRepository.verifyThreadAvailability = jest.fn(() => Promise.resolve());
     mockThreadRepository.getThreadById = jest.fn(expectedThread.id)
       .mockImplementation(() => Promise.resolve(expectedThread));
     mockCommentRepository.getCommentsByThread = jest.fn(expectedThread.id)

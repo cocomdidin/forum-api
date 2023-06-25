@@ -8,6 +8,7 @@ class AddCommentUseCase {
 
   async execute(useCasePayload) {
     await this._validatePayload(useCasePayload);
+    await this._threadRepository.verifyThreadAvailability(useCasePayload.threadId);
     const addComment = new AddComment(useCasePayload);
     return this._commentRepository.addComment(addComment);
   }
@@ -15,7 +16,6 @@ class AddCommentUseCase {
   async _validatePayload({
     threadId,
     content,
-    commentId,
     owner,
   }) {
     if (!threadId || !content || !owner) {
@@ -24,11 +24,6 @@ class AddCommentUseCase {
 
     if (typeof threadId !== 'string' || typeof content !== 'string' || typeof owner !== 'string') {
       throw new Error('ADD_COMMENT_USE_CASE.NOT_MEET_DATA_TYPE_SPECIFICATION');
-    }
-
-    const thread = await this._threadRepository.getThreadById(threadId);
-    if (!thread) {
-      throw new Error('ADD_COMMENT_USE_CASE.THREAD_ID_IS_NOT_FOUND');
     }
   }
 }
