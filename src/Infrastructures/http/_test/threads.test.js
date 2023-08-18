@@ -136,4 +136,24 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(400);
     });
   });
+
+  describe('when GET /threads/{threadId}', () => {
+    it('should response 200 when thread exists', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/thread-123',
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson.data.thread.id).toEqual('thread-123');
+    });
+  });
 });
