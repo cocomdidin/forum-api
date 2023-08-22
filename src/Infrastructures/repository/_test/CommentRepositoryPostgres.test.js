@@ -7,6 +7,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const RegisteredUser = require('../../../Domains/users/entities/RegisteredUser');
 
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
@@ -118,6 +119,11 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       expect(comments).toHaveLength(1);
+      expect(comments[0].id).toEqual('comment-123');
+      expect(comments[0].username).toEqual('dicoding');
+      expect(comments[0].date).toEqual(expect.any(Date));
+      expect(comments[0].content).toEqual('content comment');
+      expect(comments[0].deleted_at).toBeNull();
     });
   });
 

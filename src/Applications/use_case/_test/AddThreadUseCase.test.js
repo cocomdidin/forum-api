@@ -6,11 +6,7 @@ const AddThreadUseCase = require('../AddThreadUseCase');
 describe('AddThreadUseCase', () => {
   it('should throw error if use case payload not contain needed property', async () => {
     // Arrange
-    const useCasePayload = {
-      // title: 'Thread title',
-      // body: 'Thread body',
-      // owner: 'user-123',
-    };
+    const useCasePayload = {};
 
     /** creating use case instance */
     const addThreadUseCase = new AddThreadUseCase({});
