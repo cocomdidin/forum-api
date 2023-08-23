@@ -21,8 +21,8 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_DB: authapi_test
-          POSTGRES_PASSWORD: supersecretpassword
+          POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
+          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -47,13 +47,13 @@ jobs:
           CI: true
           PGHOST_TEST: localhost
           PGUSER_TEST: postgres
-          PGDATABASE_TEST: authapi_test
-          PGPASSWORD_TEST: supersecretpassword
+          PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }}
+          PGPASSWORD_TEST: ${{ secrets.PGPASSWORD_TEST }}
           PGPORT_TEST: 5432
           PGHOST: localhost
           PGUSER: postgres
-          PGDATABASE: authapi_test
-          PGPASSWORD: supersecretpassword
+          PGDATABASE: ${{ secrets.PGDATABASE_TEST }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD_TEST }}
           PGPORT: 5432
-          ACCESS_TOKEN_KEY: supersecretaccesstokenkey
-          REFRESH_TOKEN_KEY: supersecretrefreshtokenkey
+          ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
+          REFRESH_TOKEN_KEY: ${{ secrets.REFRESH_TOKEN_KEY }}
