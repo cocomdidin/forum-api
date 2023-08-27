@@ -71,6 +71,7 @@ describe('GetThreadDetailUseCase', () => {
         id: 'comment-123',
         username: 'dicoding',
         content: 'content comment',
+        likeCount: 0,
         date: '2021-08-08T07:22:53.000Z',
         deleted_at: null,
       },
@@ -110,6 +111,7 @@ describe('GetThreadDetailUseCase', () => {
       date: '2021-08-08T07:22:53.000Z',
       username: 'dicoding',
       content: 'content comment',
+      likeCount: 0,
     }];
 
     expect(threadDetail).toStrictEqual({
@@ -209,6 +211,7 @@ describe('GetThreadDetailUseCase', () => {
         date: '2021-08-08T07:22:53.000Z',
         username: 'dicoding',
         content: 'sebuah komentar',
+        likeCount: 0,
         deleted_at: new Date(),
       },
     ];
@@ -247,6 +250,7 @@ describe('GetThreadDetailUseCase', () => {
       content: '**komentar telah dihapus**',
       date: '2021-08-08T07:22:53.000Z',
       username: 'dicoding',
+      likeCount: 0,
     }];
 
     expect(threadDetail).toStrictEqual({

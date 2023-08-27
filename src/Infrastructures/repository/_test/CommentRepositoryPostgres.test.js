@@ -123,6 +123,7 @@ describe('CommentRepositoryPostgres', () => {
       expect(comments[0].username).toEqual('dicoding');
       expect(comments[0].date).toEqual(expect.any(Date));
       expect(comments[0].content).toEqual('content comment');
+      expect(comments[0].like_count).toEqual('0');
       expect(comments[0].deleted_at).toBeNull();
     });
   });

@@ -231,4 +231,39 @@ describe('/threads/thread-123/comments endpoint', () => {
       expect(responseJson.status).toEqual('success');
     });
   });
+
+  describe('when PUT /threads/thread-123/comments/comment-123/likes', () => {
+    it('should response 200 when thread comment liked', async () => {
+      // Arrange
+      const { server, accessToken, user } = await getAccessToken();
+
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-123',
+        title: 'thread title',
+        body: 'body thread',
+        owner: user.id,
+      });
+
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        content: 'thread comment',
+        threadId: 'thread-123',
+        owner: user.id,
+      });
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/thread-123/comments/comment-123/likes',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+  });
 });
