@@ -1,18 +1,8 @@
 exports.up = (pgm) => {
-  pgm.createTable('comments', {
+  pgm.createTable('likes', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
-    },
-    thread_id: {
-      type: 'VARCHAR(50)',
-      notNull: true,
-      references: 'threads',
-      onDelete: 'CASCADE',
-    },
-    content: {
-      type: 'TEXT',
-      notNull: true,
     },
     comment_id: {
       type: 'VARCHAR(50)',
@@ -20,22 +10,25 @@ exports.up = (pgm) => {
       references: 'comments',
       onDelete: 'CASCADE',
     },
-    owner: {
+    user_id: {
       type: 'VARCHAR(50)',
-      notNull: true,
+      notNull: false,
+      references: 'users',
+      onDelete: 'CASCADE',
     },
-    date: {
+    is_liked: {
+      type: 'BOOLEAN',
+      notNull: true,
+      default: true,
+    },
+    updated_at: {
       type: 'TIMESTAMP',
       notNull: true,
       default: pgm.func('current_timestamp'),
-    },
-    deleted_at: {
-      type: 'TIMESTAMP',
-      notNull: false,
     },
   });
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('comments');
+  pgm.dropTable('likes');
 };

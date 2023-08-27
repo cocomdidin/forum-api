@@ -7,7 +7,19 @@ class GetThreadDetailUseCase {
   async execute(threadId) {
     await this._validatePayload(threadId);
     await this._threadRepository.verifyThreadAvailability(threadId);
-    return this._getThreadDetail(threadId);
+
+    const thread = await this._threadRepository.getThreadById(threadId);
+    const originComments = await this._commentRepository.getCommentsByThread(threadId);
+
+    const comments = await Promise.all(originComments.map(async (comment) => ({
+      id: comment.id,
+      username: comment.username,
+      date: comment.date,
+      content: comment.deleted_at ? '**komentar telah dihapus**' : comment.content,
+      likeCount: parseInt(comment.like_count ?? 0, 10),
+    })));
+
+    return { ...thread, comments };
   }
 
   async _validatePayload(payload) {
@@ -18,24 +30,6 @@ class GetThreadDetailUseCase {
     if (typeof payload !== 'string') {
       throw new Error('GET_THREAD_DETAIL_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
-  }
-
-  async _getThreadDetail(threadId) {
-    const thread = await this._threadRepository.getThreadById(threadId);
-
-    const originComments = await this._commentRepository.getCommentsByThread(threadId);
-
-    const comments = await Promise.all(originComments.map(async (comment) => {
-      const {
-        id, username, date, content, deleted_at: deletedAt,
-      } = comment;
-
-      return {
-        id, username, date, content: deletedAt ? '**komentar telah dihapus**' : content,
-      };
-    }));
-
-    return { ...thread, comments };
   }
 }
 
