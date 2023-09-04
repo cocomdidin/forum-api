@@ -3,23 +3,23 @@ class AddReply {
     this._verifyPayload(payload);
 
     const {
-      id, commentId, userId, content,
+      threadId, commentId, userId, content,
     } = payload;
 
-    this.id = id;
+    this.threadId = threadId;
     this.commentId = commentId;
     this.userId = userId;
     this.content = content;
   }
 
   _verifyPayload({
-    id, commentId, userId, content,
+    threadId, commentId, userId, content,
   }) {
-    if (!id || !commentId || !userId || !content) {
+    if (!threadId || !commentId || !userId || !content) {
       throw new Error('ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof id !== 'string'
+    if (typeof threadId !== 'string'
       || typeof commentId !== 'string'
       || typeof userId !== 'string'
       || typeof content !== 'string') {

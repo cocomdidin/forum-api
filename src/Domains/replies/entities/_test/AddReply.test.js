@@ -12,7 +12,7 @@ describe('a AddReply entities', () => {
   it('should throw error when payload did not meet data type specification', () => {
     // Arrange
     const payload = {
-      id: 123,
+      threadId: 123,
       commentId: 123,
       userId: {},
       content: {},
@@ -25,7 +25,7 @@ describe('a AddReply entities', () => {
   it('should create addReply object correctly', () => {
     // Arrange
     const payload = {
-      id: 'reply-123',
+      threadId: 'thread-123',
       commentId: 'comment-123',
       userId: 'user-123',
       content: 'content reply',
@@ -35,7 +35,7 @@ describe('a AddReply entities', () => {
     const addReply = new AddReply(payload);
 
     // Assert
-    expect(addReply.id).toEqual(payload.id);
+    expect(addReply.threadId).toEqual(payload.threadId);
     expect(addReply.commentId).toEqual(payload.commentId);
     expect(addReply.userId).toEqual(payload.userId);
     expect(addReply.content).toEqual(payload.content);

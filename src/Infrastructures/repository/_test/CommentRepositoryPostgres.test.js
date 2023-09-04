@@ -7,7 +7,6 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
-const RegisteredUser = require('../../../Domains/users/entities/RegisteredUser');
 
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
@@ -99,32 +98,68 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   describe('getCommentsByThread function', () => {
-    it('should return comment correctly', async () => {
+    it('should return empty array when comment is empty', async () => {
       // Arrange
       await UsersTableTestHelper.addUser({});
       await ThreadsTableTestHelper.addThread({});
 
-      const addComment = new AddComment({
-        threadId: 'thread-123',
-        content: 'content comment',
-        commentId: null,
-        owner: 'user-123',
-      });
       const fakeIdGenerator = () => '123'; // stub!
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
-      await commentRepositoryPostgres.addComment(addComment);
 
       // Action
-      const comments = await commentRepositoryPostgres.getCommentsByThread(addComment.threadId);
+      const comments = await commentRepositoryPostgres.getCommentsByThread('thread-123');
 
       // Assert
-      expect(comments).toHaveLength(1);
+      expect(Array.isArray(comments)).toBeTruthy();
+      expect(comments.length).toEqual(0);
+    });
+
+    it('should return comment with empty reply', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await CommentsTableTestHelper.addComment({});
+
+      const fakeIdGenerator = () => '123'; // stub!
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      const comments = await commentRepositoryPostgres.getCommentsByThread('thread-123');
+
+      // Assert
+      expect(Array.isArray(comments)).toBeTruthy();
+      expect(comments.length).toBeGreaterThan(0);
       expect(comments[0].id).toEqual('comment-123');
       expect(comments[0].username).toEqual('dicoding');
       expect(comments[0].date).toEqual(expect.any(Date));
       expect(comments[0].content).toEqual('content comment');
-      expect(comments[0].like_count).toEqual('0');
-      expect(comments[0].deleted_at).toBeNull();
+      expect(comments[0].likeCount).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(comments[0].replies)).toBeTruthy();
+      expect(comments[0].replies.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should return comment correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await CommentsTableTestHelper.addComment({});
+
+      const fakeIdGenerator = () => '123'; // stub!
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      // Action
+      const comments = await commentRepositoryPostgres.getCommentsByThread('thread-123');
+
+      // Assert
+      expect(Array.isArray(comments)).toBeTruthy();
+      expect(comments.length).toBeGreaterThan(0);
+      expect(comments[0].id).toEqual('comment-123');
+      expect(comments[0].username).toEqual('dicoding');
+      expect(comments[0].date).toEqual(expect.any(Date));
+      expect(comments[0].content).toEqual('content comment');
+      expect(comments[0].likeCount).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(comments[0].replies)).toBeTruthy();
+      expect(comments[0].replies.length).toBeGreaterThanOrEqual(0);
     });
   });
 

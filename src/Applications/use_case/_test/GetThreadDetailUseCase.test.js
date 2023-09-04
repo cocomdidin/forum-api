@@ -3,6 +3,7 @@ const CommentRepository = require('../../../Domains/comments/CommentRepository')
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 const Thread = require('../../../Domains/threads/entities/Thread');
+const Comment = require('../../../Domains/comments/entities/Comment');
 
 describe('GetThreadDetailUseCase', () => {
   it('should throw error if use case payload not contain any property', async () => {
@@ -73,7 +74,6 @@ describe('GetThreadDetailUseCase', () => {
         content: 'content comment',
         likeCount: 0,
         date: '2021-08-08T07:22:53.000Z',
-        deleted_at: null,
       },
     ];
 
@@ -206,14 +206,14 @@ describe('GetThreadDetailUseCase', () => {
     });
 
     const mockComments = [
-      {
+      new Comment({
         id: 'comment-123',
-        date: '2021-08-08T07:22:53.000Z',
-        username: 'dicoding',
         content: 'sebuah komentar',
+        date: new Date(),
+        username: 'dicoding',
+        isDeleted: true,
         likeCount: 0,
-        deleted_at: new Date(),
-      },
+      }),
     ];
 
     /** creating dependency of use case */
@@ -245,25 +245,20 @@ describe('GetThreadDetailUseCase', () => {
       username: 'dicoding',
     };
 
-    const expectedComments = [{
-      id: 'comment-123',
-      content: '**komentar telah dihapus**',
-      date: '2021-08-08T07:22:53.000Z',
-      username: 'dicoding',
-      likeCount: 0,
-    }];
+    const expectedComments = [
+      new Comment({
+        id: 'comment-123',
+        content: 'sebuah komentar',
+        date: mockComments[0].date,
+        username: 'dicoding',
+        isDeleted: true,
+        likeCount: 0,
+      }),
+    ];
 
-    expect(threadDetail).toStrictEqual({
-      ...expectedThread,
-      comments: expectedComments,
-    });
-
-    expect(threadDetail.id).toBe(expectedThread.id);
-    expect(threadDetail.title).toBe(expectedThread.title);
-    expect(threadDetail.body).toBe(expectedThread.body);
-    expect(threadDetail.date).toBe(expectedThread.date);
-    expect(threadDetail.username).toBe(expectedThread.username);
+    expect(threadDetail).toStrictEqual({ ...expectedThread, comments: expectedComments });
     expect(threadDetail.comments).toStrictEqual(expectedComments);
+    expect(Array.isArray(threadDetail.comments[0].replies)).toBe(true);
 
     expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(expectedThread.id);
     expect(mockThreadRepository.getThreadById).toBeCalledWith(expectedThread.id);

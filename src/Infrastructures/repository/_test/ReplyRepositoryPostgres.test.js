@@ -6,6 +6,8 @@ const pool = require('../../database/postgres/pool');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const Reply = require('../../../Domains/replies/entities/Reply');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 describe('ReplyRepositoryPostgres', () => {
   beforeAll(async () => {
@@ -78,6 +80,61 @@ describe('ReplyRepositoryPostgres', () => {
       expect(reply[0].content).toEqual('content comment');
       expect(reply[0].date).not.toBeNull();
       expect(reply[0].username).toEqual('dicoding');
+    });
+  });
+
+  describe('verifyReplyAvailability function', () => {
+    it('should not throw NotFoundError when reply available', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Assert & action
+      await expect(replyRepositoryPostgres.verifyReplyAvailability('reply-123'))
+        .resolves.not.toThrowError(NotFoundError);
+    });
+
+    it('should throw NotFoundError when reply not available', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Assert & action
+      await expect(replyRepositoryPostgres.verifyReplyAvailability('reply-xxx'))
+        .rejects.toThrowError(NotFoundError);
+    });
+  });
+
+  describe('verifyReplyOwner function', () => {
+    it('should not throw AuthorizationError when reply owner', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Assert & action
+      await expect(replyRepositoryPostgres.verifyReplyOwner({ id: 'reply-123', userId: 'user-123' }))
+        .resolves.not.toThrowError(AuthorizationError);
+    });
+
+    it('should throw AuthorizationError when not reply owner', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Assert & action
+      await expect(replyRepositoryPostgres.verifyReplyOwner({ id: 'reply-123', userId: 'user-xxx' }))
+        .rejects.toThrowError(AuthorizationError);
+    });
+  });
+
+  describe('deleteReply function', () => {
+    it('should delete reply correctly', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      await replyRepositoryPostgres.deleteReply({ id: 'reply-123' });
+
+      // Assert
+      const reply = await RepliesTableTestHelper.findReplyById('reply-123');
+      expect(reply).toHaveLength(1);
+      expect(reply[0].deleted_at).toEqual(expect.any(Date));
     });
   });
 });

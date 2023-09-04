@@ -1,6 +1,8 @@
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
 const Reply = require('../../Domains/replies/entities/Reply');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 
 class LikeRepositoryPostgres extends ReplyRepository {
   constructor(pool, idGenerator) {
@@ -45,6 +47,41 @@ class LikeRepositoryPostgres extends ReplyRepository {
       username: result.username,
       isDeleted: result.deleted_at != null,
     }));
+  }
+
+  async deleteReply({ id }) {
+    const query = {
+      text: 'UPDATE replies SET deleted_at = NOW() WHERE id = $1',
+      values: [id],
+    };
+
+    await this._pool.query(query);
+  }
+
+  async verifyReplyAvailability(id) {
+    const query = {
+      text: 'SELECT id FROM replies WHERE deleted_at IS NULL AND id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError('reply tidak ditemukan');
+    }
+  }
+
+  async verifyReplyOwner({ id, userId }) {
+    const query = {
+      text: 'SELECT id FROM replies WHERE deleted_at IS NULL AND id = $1 AND user_id = $2',
+      values: [id, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (result.rowCount === 0) {
+      throw new AuthorizationError('anda bukan pemilik reply ini');
+    }
   }
 }
 

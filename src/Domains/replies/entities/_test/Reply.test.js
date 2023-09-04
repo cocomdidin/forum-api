@@ -26,7 +26,7 @@ describe('a Reply entities', () => {
   it('should create Reply object correctly', () => {
     // Arrange
     const payload = {
-      id: 'reply-BErOXUSefjwWGW1Z10Ihk',
+      id: 'reply-123',
       content: 'content balasan',
       date: '2021-08-08T07:59:48.766Z',
       username: 'johndoe',
@@ -46,7 +46,7 @@ describe('a Reply entities', () => {
   it('should create Reply object when deleted reply correctly', () => {
     // Arrange
     const payload = {
-      id: 'reply-BErOXUSefjwWGW1Z10Ihk',
+      id: 'reply-123',
       content: 'content balasan',
       date: '2021-08-08T07:59:48.766Z',
       username: 'johndoe',

@@ -2,6 +2,8 @@ const AddCommentUseCase = require('../../../../Applications/use_case/AddCommentU
 const AddThreadUseCase = require('../../../../Applications/use_case/AddThreadUseCase');
 const DeleteCommentUseCase = require('../../../../Applications/use_case/DeleteCommentUseCase');
 const ReverseLikeOfCommentUseCase = require('../../../../Applications/use_case/ReverseLikeOfCommentUseCase');
+const AddReplyUseCase = require('../../../../Applications/use_case/AddReplyUseCase');
+const DeleteReplyUseCase = require('../../../../Applications/use_case/DeleteReplyUseCase');
 
 class ThreadsHandler {
   constructor(container) {
@@ -11,6 +13,8 @@ class ThreadsHandler {
     this.postThreadHandler = this.postThreadHandler.bind(this);
     this.postCommentHandler = this.postCommentHandler.bind(this);
     this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
+    this.postReplyHandler = this.postReplyHandler.bind(this);
+    this.deleteReplyHandler = this.deleteReplyHandler.bind(this);
     this.putLikeHandler = this.putLikeHandler.bind(this);
   }
 
@@ -85,6 +89,41 @@ class ThreadsHandler {
     const payload = { threadId, commentId, userId: id };
 
     await reverseLikeOfCommentUseCase.execute(payload);
+
+    return {
+      status: 'success',
+    };
+  }
+
+  async postReplyHandler(request, h) {
+    const addReplyUseCase = this._container.getInstance(AddReplyUseCase.name);
+    const { id } = request.auth.credentials;
+    const { threadId, commentId } = request.params;
+    const payload = {
+      ...request.payload, userId: id, threadId, commentId,
+    };
+
+    const addedReply = await addReplyUseCase.execute(payload);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        addedReply,
+      },
+    });
+    response.code(201);
+    return response;
+  }
+
+  async deleteReplyHandler(request) {
+    const deleteReplyUseCase = this._container.getInstance(DeleteReplyUseCase.name);
+    const { id } = request.auth.credentials;
+    const { threadId, commentId, replyId } = request.params;
+    const payload = {
+      userId: id, threadId, commentId, id: replyId,
+    };
+
+    await deleteReplyUseCase.execute(payload);
 
     return {
       status: 'success',
